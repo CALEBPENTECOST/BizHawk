@@ -18,13 +18,21 @@ namespace CPENTECOST.BizHawk.DeepLearning
     {
         Backend mBackendModel = null;
 
-        bool grayscale = false;
+        DisplayModes dispMode = DisplayModes.RGB;
 
         public UserView(Backend attachedBackend)
         {    
             InitializeComponent();
 
             mBackendModel = attachedBackend;
+
+            // Set up the combo box and choose the first item
+            comboBox_imageMode.Items.Clear();
+            foreach (var item in Enum.GetValues(typeof(DisplayModes)))
+            {
+                comboBox_imageMode.Items.Add(item);
+            }
+            comboBox_imageMode.SelectedIndex = 0;
         }
 
         
@@ -94,12 +102,36 @@ namespace CPENTECOST.BizHawk.DeepLearning
         {
             // We now have an image prolly!! Just show it
             var image = mBackendModel.capuredImage.ToSysdrawingBitmap();
-            if (grayscale)
+
+            int monoKernel_w = 1;
+            int monoKernel_h = 1;
+            switch (dispMode)
             {
-                var grayData = mBackendModel.capuredImage.ToGrayscaleImage();
-                //grayData.Data = getTestData();
-                var grayBmp = CopyDataToBitmap(grayData);
-                image = grayBmp;
+                case DisplayModes.Monochrome_Quarter:
+                    monoKernel_w = 4;
+                    monoKernel_h = 4;
+                    goto case DisplayModes.Monochrome;
+                case DisplayModes.Monochrome_Half:
+                    monoKernel_w = 2;
+                    monoKernel_h = 2;
+                    goto case DisplayModes.Monochrome;
+                case DisplayModes.Monochrome:
+                    // We need to extract the monochrome image and assign the output image to the result
+                    var grayData = mBackendModel.capuredImage.ToGrayscaleImage(monoKernel_w, monoKernel_h);
+                    var grayBmp = CopyDataToBitmap(grayData);
+                    image = grayBmp;
+                    break;
+                case DisplayModes.RGB:
+                    // Do nothing special
+                    break;
+                default:
+                    // Should never get here. Assume color image
+                    break;
+            }
+
+            if (dispMode != DisplayModes.RGB)
+            {
+               
             }
 
 
@@ -114,6 +146,11 @@ namespace CPENTECOST.BizHawk.DeepLearning
 
             // Also update the picture box
             UpdatePictureBox();
+
+            // Update the RAM watch as well
+            uint watchVal = mBackendModel.GetWatchVal(textBox_watchName.Text);
+            textBox_watchValUint.Text = watchVal.ToString();
+            textBox_watchValFloat.Text = ((float)watchVal).ToString();
         }
 
         private void UpdateFrameCounter()
@@ -121,9 +158,42 @@ namespace CPENTECOST.BizHawk.DeepLearning
             //throw new NotImplementedException();
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        /// <summary>
+        /// Enumerates all of the ways the input image is handled
+        /// </summary>
+        private enum DisplayModes
         {
-            grayscale = checkBox1.Checked;
+            RGB,
+            Monochrome,
+            Monochrome_Half,
+            Monochrome_Quarter
+        }
+
+        private void comboBox_imageMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // When the color mode changes, we need to set our enum appropriately
+            dispMode = (DisplayModes)comboBox_imageMode.SelectedItem;
+        }
+
+        private void button_setWatch_Click(object sender, EventArgs e)
+        {
+            // The user wants to set a watch! Call the appropriate function
+            SetUserWatch();
+        }
+
+        private void SetUserWatch()
+        {
+            // Get the data from the text boxes
+            string wName = textBox_watchName.Text;
+
+            int addressVal = Convert.ToInt32(textBox_watchAddr.Text, 16);
+            long wAddr = (long)addressVal;
+
+            string wNotes = textBox_watchNotes.Text;
+
+            // Tell the backend what we want to do
+            mBackendModel.ClearRamWatches();
+            mBackendModel.AddRamWatch(wName, wAddr, wNotes);
         }
     }
 }

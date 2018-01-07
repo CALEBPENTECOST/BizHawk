@@ -587,24 +587,31 @@ namespace BizHawk.Bizware.BizwareGL
         /// TODO: Find a faster way to do this
         /// </summary>
         /// <returns>The converted byte array</returns>
-        public unsafe QuickGrayImage ToGrayscaleImage()
+        public unsafe QuickGrayImage ToGrayscaleImage(int kernelWidth = 1, int kernelHeight = 1)
         {
-            byte[] dataArray = new byte[Width * Height];
-            for(int row = 0; row < Height; ++row)
+            byte[] dataArray = new byte[(Width / kernelWidth) * (Height / kernelHeight)];
+            
+            for(int row = 0; row < Height;)
             {
-                for (int col = 0; col < Width; ++col)
+                for (int col = 0; col < Width;)
                 {
                     var pixel = GetPixelAsColor(col, row);
                     byte r = pixel.R;
                     byte g = pixel.G;
                     byte b = pixel.B;
                     byte gray = (byte)(0.3 * r + 0.5 * g + 0.2 * b);
-                    dataArray[(row * Width) + col] = gray;
+                    dataArray[((row / kernelHeight) * (Width / kernelWidth)) + (col / kernelWidth)] = gray;
+
+                    // On to the next column!
+                    col = col + kernelWidth;
                 }
+
+                // On to the next row!
+                row = row + kernelHeight;
             }
 
             // Return the new buffer
-            return new QuickGrayImage(Width, Height, Width, dataArray);
+            return new QuickGrayImage((Width / kernelWidth), (Height / kernelHeight), (Width / kernelWidth), dataArray);
         }
 
 	}

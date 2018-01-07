@@ -92,7 +92,7 @@ namespace CPENTECOST.BizHawk.DeepLearning
 
         public void GetCurrentGameImage()
         {
-            lock(locker)
+            lock (locker)
             {
                 capuredImage = new BitmapBuffer(mGameVideo.BufferWidth, mGameVideo.BufferHeight, mGameVideo.GetVideoBuffer());
             }
@@ -103,25 +103,122 @@ namespace CPENTECOST.BizHawk.DeepLearning
             mGameVideo = _currentVideoProvider;
         }
 
+        private List<RamWatch> list_ramWatches = new List<RamWatch>();
+
+        public uint GetWatchVal(string name)
+        {
+            // Check each watch
+            foreach(var watch in list_ramWatches)
+            {
+                // If the name matches, return the value
+                if (watch.Name == name)
+                {
+                    return watch.Value;
+                }
+            }
+
+            // Didn't find that name. Return 0
+            return 0;
+        }
+
+        private class RamWatch
+        {
+            public string Name;
+            public long Address;
+            public uint Value;
+            public string Notes;
+
+            public RamWatch(string n, long a, string m = "No Notes")
+            {
+                Name = n;
+                Address = a;
+                Notes = n;
+                Value = 0;
+            }
+        }
+
+        public void ClearRamWatches()
+        {
+            lock (locker)
+            {
+                list_ramWatches.Clear();
+            }
+        }
+
+        public void AddRamWatch(string name, long address, string notes = "No Notes")
+        {
+            // We want to add a new RAM watch to the list
+            // Make sure nothing else has the same name or address
+            lock (locker)
+            {
+                foreach (var watch in list_ramWatches)
+                {
+                    if (watch.Name == name || watch.Address == address)
+                    {
+                        // Duplicate! Do not add
+                        MessageBox.Show("Duplicate value not added");
+                        return;
+                    }
+                }
+
+                // Add to the list!
+                list_ramWatches.Add(new RamWatch(name, address, notes));
+            }
+        }
+
+        private void ReadAllRamWatches()
+        {
+            lock (locker)
+            {
+                // Lets go into each ram watch and update the value
+                for (int index = 0; index < list_ramWatches.Count; index++)
+                {
+                    list_ramWatches[index].Value = ReadMainMemoryUint(list_ramWatches[index].Address);
+                }
+            }
+        }
+
         public void NewFrameReady(int frameNumber)
         {
-            lock(locker)
+            lock (locker)
             {
+                // Get frame info and save it in the model
                 mCurrentFrameNumber = frameNumber;
+
+                // Acquire an image (we will always want the image)
                 GetCurrentGameImage();
 
-                // Let the GUI know its time to update its view of the model
+                // Also fill out our dictionary of read values
+                ReadAllRamWatches();
+
+                // Finally, let the GUI know its time to update its view of the model
                 ForceViewUpdate();
             }
         }
 
         private void ForceViewUpdate()
         {
-            mUserView.Invoke((MethodInvoker)delegate
+            // Tell the other GUI to update, but don't wait for it to finish
+            mUserView.BeginInvoke((MethodInvoker)delegate
             {
-                // close the form on the forms thread
+                // Update the form on the forms thread
                 mUserView.ForceViewUpdate();
             });
+        }
+
+        [RequiredService]
+        public IMemoryDomains MemoryDomains
+        {
+            get;
+            set;
+        }
+
+        private uint ReadMainMemoryUint(long addr = 0x1644D0)
+        {
+            var main = MemoryDomains.MainMemory;
+            var value = main.PeekUint(addr, true);
+
+            return value;
         }
     }
 }
