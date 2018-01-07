@@ -563,6 +563,50 @@ namespace BizHawk.Bizware.BizwareGL
 			bmp.UnlockBits(bmpdata);
 		}
 
+        /// <summary>
+        /// Very basic holdre of image data. Color data is 6bpp Grayscale
+        /// </summary>
+        public struct QuickGrayImage
+        {
+            public int Width;
+            public int Height;
+            public int Stride;
+            public byte[] Data;
+
+            public QuickGrayImage(int width, int height, int stride, byte[] data)
+            {
+                Width = width;
+                Height = height;
+                Stride = stride;
+                Data = data;
+            }
+        }
+
+        /// <summary>
+        /// Converts the image to an 8bpp byte array
+        /// TODO: Find a faster way to do this
+        /// </summary>
+        /// <returns>The converted byte array</returns>
+        public unsafe QuickGrayImage ToGrayscaleImage()
+        {
+            byte[] dataArray = new byte[Width * Height];
+            for(int row = 0; row < Height; ++row)
+            {
+                for (int col = 0; col < Width; ++col)
+                {
+                    var pixel = GetPixelAsColor(col, row);
+                    byte r = pixel.R;
+                    byte g = pixel.G;
+                    byte b = pixel.B;
+                    byte gray = (byte)(0.3 * r + 0.5 * g + 0.2 * b);
+                    dataArray[(row * Width) + col] = gray;
+                }
+            }
+
+            // Return the new buffer
+            return new QuickGrayImage(Width, Height, Width, dataArray);
+        }
+
 	}
 
 }

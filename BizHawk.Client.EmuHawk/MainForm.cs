@@ -425,6 +425,10 @@ namespace BizHawk.Client.EmuHawk
 
 		private readonly bool _supressSyncSettingsWarning;
 
+        /// <summary>
+        /// This is the main game loop. It will emulate a frame and render it, etc.
+        /// </summary>
+        /// <returns></returns>
 		public int ProgramRunLoop()
 		{
 			CheckMessages(); // can someone leave a note about why this is needed?
@@ -446,6 +450,7 @@ namespace BizHawk.Client.EmuHawk
 
 			InitializeFpsData();
 
+            int currentFrameNumber = 0;
 			for (;;)
 			{
 				Input.Instance.Update();
@@ -502,17 +507,42 @@ namespace BizHawk.Client.EmuHawk
 				{
 					Thread.Sleep(0);
 				}
-			}
+
+                // Done with this frame. Call all of the functions that are waiting on it
+                FrameComplete?.Invoke(this, new FrameCompleteEventArgs(currentFrameNumber));
+                currentFrameNumber = currentFrameNumber + 1;
+
+
+            }
 
 			Shutdown();
 			return _exitCode;
 		}
 
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-		protected override void Dispose(bool disposing)
+        /// <summary>
+        /// A frame complete event to subscribe to
+        /// </summary>
+        public event EventHandler<FrameCompleteEventArgs> FrameComplete;
+
+        /// <summary>
+        /// Args for the "frame complete" event
+        /// </summary>
+        public class FrameCompleteEventArgs : EventArgs
+        {
+            public int FrameNumber;
+
+            public FrameCompleteEventArgs(int frameNum)
+            {
+                FrameNumber = frameNum;
+            }
+
+        }
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
 		{
 			// NOTE: this gets called twice sometimes. once by using() in Program.cs and once from winforms internals when the form is closed...
 			if (GlobalWin.DisplayManager != null)
@@ -2026,12 +2056,15 @@ namespace BizHawk.Client.EmuHawk
 				FrameBufferResized();
 			}
 
-			//rendering flakes out egregiously if we have a zero size
-			//can we fix it later not to?
-			if(isZero)
-				GlobalWin.DisplayManager.Blank();
-			else
-				GlobalWin.DisplayManager.UpdateSource(video);
+            //rendering flakes out egregiously if we have a zero size
+            //can we fix it later not to?
+            if (isZero)
+                GlobalWin.DisplayManager.Blank();
+            else
+            {
+                // Here is where each frame is updated
+                GlobalWin.DisplayManager.UpdateSource(video);
+            }
 		}
 
 		// sends a simulation of a plain alt key keystroke
@@ -4297,10 +4330,24 @@ namespace BizHawk.Client.EmuHawk
         private void neuralNetToolsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Start the neural net backend and request a form
-            CPENTECOST.BizHawk.DeepLearning.Backend.GetInstance().RequestView();
+            var nnInstace = CPENTECOST.BizHawk.DeepLearning.Backend.GetInstance();
+            FrameComplete += MainForm_NeuralNetNewFrameReady;
+            nnInstace.SetVideoProvider(_currentVideoProvider);
+            nnInstace.RequestView(this);
 
             // Disable this menu item as well -- no need to let the user run it twice
             this.neuralNetToolsToolStripMenuItem.Enabled = false;
+        }
+
+        /// <summary>
+        /// Alerts the neural net system that a new frame is ready
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainForm_NeuralNetNewFrameReady(object sender, FrameCompleteEventArgs e)
+        {
+            var nnInstace = CPENTECOST.BizHawk.DeepLearning.Backend.GetInstance();
+            nnInstace.NewFrameReady(e.FrameNumber);
         }
 
         private bool Rewind(ref bool runFrame, long currentTimestamp, out bool returnToRecording)
