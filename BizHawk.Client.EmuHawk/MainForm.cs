@@ -36,6 +36,8 @@ using BizHawk.Emulation.Cores.Consoles.Sega.PicoDrive;
 using BizHawk.Emulation.Cores.Consoles.Nintendo.Gameboy;
 using BizHawk.Emulation.Cores.Atari.A7800Hawk;
 
+using CPENTECOST.BizHawk.DeepLearning;
+
 namespace BizHawk.Client.EmuHawk
 {
 	public partial class MainForm : Form
@@ -4294,7 +4296,12 @@ namespace BizHawk.Client.EmuHawk
 			GenericCoreConfig.DoDialog(this, "PC-FX Settings");
 		}
 
-		private bool Rewind(ref bool runFrame, long currentTimestamp, out bool returnToRecording)
+        private void neuralNetToolsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private bool Rewind(ref bool runFrame, long currentTimestamp, out bool returnToRecording)
 		{
 			var isRewinding = false;
 
