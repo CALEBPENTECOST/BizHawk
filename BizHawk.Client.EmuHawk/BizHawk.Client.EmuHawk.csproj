@@ -1703,6 +1703,10 @@
       <Project>{9F84A0B2-861E-4EF4-B89B-5E2A3F38A465}</Project>
       <Name>BizHawk.Bizware.BizwareGL</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CPENTECOST.BizHawk.DeepLearning\CPENTECOST.BizHawk.DeepLearning.csproj">
+      <Project>{8c807526-8347-48d0-9619-c150a1cc441a}</Project>
+      <Name>CPENTECOST.BizHawk.DeepLearning</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AboutBox.resx">
