@@ -4327,28 +4327,16 @@ namespace BizHawk.Client.EmuHawk
 			GenericCoreConfig.DoDialog(this, "PC-FX Settings");
 		}
 
-        private void neuralNetToolsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            // Start the neural net backend and request a form
-            var nnInstace = CPENTECOST.BizHawk.DeepLearning.Backend.GetInstance();
-            FrameComplete += MainForm_NeuralNetNewFrameReady;
-            nnInstace.SetVideoProvider(_currentVideoProvider);
-            nnInstace.RequestView(this);
-
-            // Disable this menu item as well -- no need to let the user run it twice
-            this.neuralNetToolsToolStripMenuItem.Enabled = false;
-        }
-
-        /// <summary>
-        /// Alerts the neural net system that a new frame is ready
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MainForm_NeuralNetNewFrameReady(object sender, FrameCompleteEventArgs e)
-        {
-            var nnInstace = CPENTECOST.BizHawk.DeepLearning.Backend.GetInstance();
-            nnInstace.NewFrameReady(e.FrameNumber);
-        }
+       ///// <summary>
+       ///// Alerts the neural net system that a new frame is ready
+       ///// </summary>
+       ///// <param name="sender"></param>
+       ///// <param name="e"></param>
+       //private void MainForm_NeuralNetNewFrameReady(object sender, FrameCompleteEventArgs e)
+       //{
+       //    var nnInstace = CPENTECOST.BizHawk.DeepLearning.Backend.GetInstance();
+       //    nnInstace.NewFrameReady(e.FrameNumber);
+       //}
 
         private bool Rewind(ref bool runFrame, long currentTimestamp, out bool returnToRecording)
 		{

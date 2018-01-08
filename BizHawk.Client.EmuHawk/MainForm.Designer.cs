@@ -235,7 +235,7 @@
             this.AutoHawkMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.NewHexEditorMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator38 = new System.Windows.Forms.ToolStripSeparator();
-            this.neuralNetToolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.NeuralNetMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.NESSubMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.coreToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quickNESToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -2047,7 +2047,7 @@
             this.batchRunnerToolStripMenuItem,
             this.ExperimentalToolsSubMenu,
             this.toolStripSeparator38,
-            this.neuralNetToolsToolStripMenuItem});
+            this.NeuralNetMenuItem});
             this.ToolsSubMenu.Name = "ToolsSubMenu";
             this.ToolsSubMenu.Size = new System.Drawing.Size(48, 19);
             this.ToolsSubMenu.Text = "&Tools";
@@ -2240,10 +2240,10 @@
             // 
             // neuralNetToolsToolStripMenuItem
             // 
-            this.neuralNetToolsToolStripMenuItem.Name = "neuralNetToolsToolStripMenuItem";
-            this.neuralNetToolsToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.neuralNetToolsToolStripMenuItem.Text = "Neural Net Tools";
-            this.neuralNetToolsToolStripMenuItem.Click += new System.EventHandler(this.neuralNetToolsToolStripMenuItem_Click);
+            this.NeuralNetMenuItem.Name = "neuralNetToolsToolStripMenuItem";
+            this.NeuralNetMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.NeuralNetMenuItem.Text = "Neural Net Tools";
+            this.NeuralNetMenuItem.Click += new System.EventHandler(this.neuralNetToolsToolStripMenuItem_Click);
             // 
             // NESSubMenu
             // 
@@ -4476,6 +4476,6 @@
 		private System.Windows.Forms.ToolStripMenuItem SMSControllerSportsPadToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem SMSControllerKeyboardToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator38;
-        private System.Windows.Forms.ToolStripMenuItem neuralNetToolsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem NeuralNetMenuItem;
     }
 }

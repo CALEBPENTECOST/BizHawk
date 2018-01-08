@@ -801,7 +801,30 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
-		public Cheats Cheats
+        public NeuralNet NeuralNet
+        {
+            get
+            {
+                var tool = _tools.FirstOrDefault(t => t is NeuralNet);
+                if (tool != null)
+                {
+                    if (tool.IsDisposed)
+                    {
+                        _tools.Remove(tool);
+                    }
+                    else
+                    {
+                        return tool as NeuralNet;
+                    }
+                }
+
+                var newTool = new NeuralNet();
+                _tools.Add(newTool);
+                return newTool;
+            }
+        }
+
+        public Cheats Cheats
 		{
 			get
 			{

@@ -1362,17 +1362,16 @@ namespace BizHawk.Client.EmuHawk
 			TAStudioMenuItem.ShortcutKeyDisplayString = Global.Config.HotkeyBindings["TAStudio"].Bindings;
 			VirtualPadMenuItem.ShortcutKeyDisplayString = Global.Config.HotkeyBindings["Virtual Pad"].Bindings;
 			TraceLoggerMenuItem.ShortcutKeyDisplayString = Global.Config.HotkeyBindings["Trace Logger"].Bindings;
-			TraceLoggerMenuItem.Enabled = GlobalWin.Tools.IsAvailable<TraceLogger>();
-			CodeDataLoggerMenuItem.Enabled = GlobalWin.Tools.IsAvailable<CDL>();
 
-			TAStudioMenuItem.Enabled = GlobalWin.Tools.IsAvailable<TAStudio>();
-
-			CheatsMenuItem.Enabled = GlobalWin.Tools.IsAvailable<Cheats>();
-			HexEditorMenuItem.Enabled = GlobalWin.Tools.IsAvailable<HexEditor>();
-			RamSearchMenuItem.Enabled = GlobalWin.Tools.IsAvailable<RamSearch>();
-			RamWatchMenuItem.Enabled = GlobalWin.Tools.IsAvailable<RamWatch>();
-
-			DebuggerMenuItem.Enabled = GlobalWin.Tools.IsAvailable<GenericDebugger>();
+			TraceLoggerMenuItem.Enabled     = GlobalWin.Tools.IsAvailable<TraceLogger>();
+			CodeDataLoggerMenuItem.Enabled  = GlobalWin.Tools.IsAvailable<CDL>();
+			TAStudioMenuItem.Enabled        = GlobalWin.Tools.IsAvailable<TAStudio>();
+			CheatsMenuItem.Enabled          = GlobalWin.Tools.IsAvailable<Cheats>();
+			HexEditorMenuItem.Enabled       = GlobalWin.Tools.IsAvailable<HexEditor>();
+			RamSearchMenuItem.Enabled       = GlobalWin.Tools.IsAvailable<RamSearch>();
+            NeuralNetMenuItem.Enabled       = GlobalWin.Tools.IsAvailable<NeuralNet>();
+			RamWatchMenuItem.Enabled        = GlobalWin.Tools.IsAvailable<RamWatch>();
+			DebuggerMenuItem.Enabled        = GlobalWin.Tools.IsAvailable<GenericDebugger>();
 
 			batchRunnerToolStripMenuItem.Visible = VersionInfo.DeveloperBuild;
 
@@ -1431,7 +1430,21 @@ namespace BizHawk.Client.EmuHawk
 			GlobalWin.Tools.Load<RamSearch>();
 		}
 
-		private void LuaConsoleMenuItem_Click(object sender, EventArgs e)
+        private void neuralNetToolsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Start the neural net backend and request a form
+            //var nnInstace = CPENTECOST.BizHawk.DeepLearning.Backend.GetInstance();
+            //FrameComplete += MainForm_NeuralNetNewFrameReady;
+            //nnInstace.SetVideoProvider(_currentVideoProvider);
+            //nnInstace.RequestView(this);
+            //
+            //// Disable this menu item as well -- no need to let the user run it twice
+            //this.neuralNetToolsToolStripMenuItem.Enabled = false;
+
+            GlobalWin.Tools.Load<NeuralNet>();
+        }
+
+        private void LuaConsoleMenuItem_Click(object sender, EventArgs e)
 		{
 			OpenLuaConsole();
 		}
